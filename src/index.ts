@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   Tool,
-} from "@modelcontextprotocol/sdk/types.js";
-import puppeteer, { Browser, Page } from "puppeteer";
+} from '@modelcontextprotocol/sdk/types.js';
+import puppeteer, { Browser, Page } from 'puppeteer';
 import { ElementHandle } from 'puppeteer';
-import * as cheerio from "cheerio";
-import { z } from "zod";
-import fs from "fs/promises";
-import path from "path";
+import * as cheerio from 'cheerio';
+import { z } from 'zod';
+import fs from 'fs/promises';
+import path from 'path';
 
 /// <reference lib="dom" />
 
@@ -36,7 +36,7 @@ interface ElementInfo {
   ariaLabel?: string;
   href?: string;
   src?: string;
-  interactionType: "click" | "input" | "select" | "navigation" | "media";
+  interactionType: 'click' | 'input' | 'select' | 'navigation' | 'media';
 }
 
 interface PageAnalysis {
@@ -67,7 +67,7 @@ class CypressTestGenerator {
     if (!this.browser) {
       this.browser = await puppeteer.launch({
         headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
       });
     }
   }
@@ -89,7 +89,7 @@ class CypressTestGenerator {
     const page = await this.browser!.newPage();
 
     try {
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
 
       // Wait a bit for dynamic content to load
       await new Promise((res) => setTimeout(res, 2000));
@@ -137,66 +137,66 @@ class CypressTestGenerator {
       elements.push({
         selector: this.generateSelector($el),
         tag: el.tagName.toLowerCase(),
-        id: $el.attr("id"),
-        className: $el.attr("class"),
+        id: $el.attr('id'),
+        className: $el.attr('class'),
         text: $el.text().trim(),
-        role: $el.attr("role"),
-        ariaLabel: $el.attr("aria-label"),
-        interactionType: "click",
+        role: $el.attr('role'),
+        ariaLabel: $el.attr('aria-label'),
+        interactionType: 'click',
       });
     });
 
     // Input elements
-    $("input, textarea, select").each((_, el) => {
+    $('input, textarea, select').each((_, el) => {
       const $el = $(el);
-      const type = $el.attr("type") || "text";
+      const type = $el.attr('type') || 'text';
 
       elements.push({
         selector: this.generateSelector($el),
         tag: el.tagName.toLowerCase(),
         type,
-        id: $el.attr("id"),
-        className: $el.attr("class"),
-        name: $el.attr("name"),
-        placeholder: $el.attr("placeholder"),
-        ariaLabel: $el.attr("aria-label"),
+        id: $el.attr('id'),
+        className: $el.attr('class'),
+        name: $el.attr('name'),
+        placeholder: $el.attr('placeholder'),
+        ariaLabel: $el.attr('aria-label'),
         interactionType:
-          type === "submit" || type === "button"
-            ? "click"
-            : el.tagName.toLowerCase() === "select"
-            ? "select"
-            : "input",
+          type === 'submit' || type === 'button'
+            ? 'click'
+            : el.tagName.toLowerCase() === 'select'
+              ? 'select'
+              : 'input',
       });
     });
 
     // Links
-    $("a[href]").each((_, el) => {
+    $('a[href]').each((_, el) => {
       const $el = $(el);
       elements.push({
         selector: this.generateSelector($el),
-        tag: "a",
-        href: $el.attr("href"),
+        tag: 'a',
+        href: $el.attr('href'),
         text: $el.text().trim(),
-        ariaLabel: $el.attr("aria-label"),
-        interactionType: "navigation",
+        ariaLabel: $el.attr('aria-label'),
+        interactionType: 'navigation',
       });
     });
 
     // Media elements
-    $("img, video, audio").each((_, el) => {
+    $('img, video, audio').each((_, el) => {
       const $el = $(el);
       elements.push({
         selector: this.generateSelector($el),
         tag: el.tagName.toLowerCase(),
-        src: $el.attr("src"),
-        ariaLabel: $el.attr("aria-label") || $el.attr("alt"),
-        interactionType: "media",
+        src: $el.attr('src'),
+        ariaLabel: $el.attr('aria-label') || $el.attr('alt'),
+        interactionType: 'media',
       });
     });
   }
 
   private parseForms($: cheerio.CheerioAPI, forms: FormInfo[]) {
-    $("form").each((_, form) => {
+    $('form').each((_, form) => {
       const $form = $(form);
       const fields: ElementInfo[] = [];
 
@@ -204,39 +204,39 @@ class CypressTestGenerator {
         .find('input, textarea, select, button[type="submit"]')
         .each((_, field) => {
           const $field = $(field);
-          const type = $field.attr("type") || "text";
+          const type = $field.attr('type') || 'text';
 
           fields.push({
             selector: this.generateSelector($field),
             tag: field.tagName.toLowerCase(),
             type,
-            id: $field.attr("id"),
-            className: $field.attr("class"),
-            name: $field.attr("name"),
-            placeholder: $field.attr("placeholder"),
-            ariaLabel: $field.attr("aria-label"),
+            id: $field.attr('id'),
+            className: $field.attr('class'),
+            name: $field.attr('name'),
+            placeholder: $field.attr('placeholder'),
+            ariaLabel: $field.attr('aria-label'),
             interactionType:
-              type === "submit" || field.tagName.toLowerCase() === "button"
-                ? "click"
-                : field.tagName.toLowerCase() === "select"
-                ? "select"
-                : "input",
+              type === 'submit' || field.tagName.toLowerCase() === 'button'
+                ? 'click'
+                : field.tagName.toLowerCase() === 'select'
+                  ? 'select'
+                  : 'input',
           });
         });
 
       forms.push({
         selector: this.generateSelector($form),
-        method: $form.attr("method"),
-        action: $form.attr("action"),
+        method: $form.attr('method'),
+        action: $form.attr('action'),
         fields,
       });
     });
   }
 
   private parseNavigation($: cheerio.CheerioAPI, navigation: NavigationInfo[]) {
-    $("nav a, .nav a, .navbar a, .menu a").each((_, el) => {
+    $('nav a, .nav a, .navbar a, .menu a').each((_, el) => {
       const $el = $(el);
-      const href = $el.attr("href");
+      const href = $el.attr('href');
       if (href) {
         navigation.push({
           selector: this.generateSelector($el),
@@ -248,23 +248,23 @@ class CypressTestGenerator {
   }
 
   private generateSelector($el: cheerio.Cheerio<any>): string {
-    const id = $el.attr("id");
+    const id = $el.attr('id');
     if (id) return `#${id}`;
 
-    const dataTestId = $el.attr("data-testid") || $el.attr("data-test-id");
+    const dataTestId = $el.attr('data-testid') || $el.attr('data-test-id');
     if (dataTestId) return `[data-testid="${dataTestId}"]`;
 
-    const name = $el.attr("name");
+    const name = $el.attr('name');
     if (name) return `[name="${name}"]`;
 
     // Generate a more specific selector based on context
-    const tag = $el.prop("tagName")?.toLowerCase();
-    const className = $el.attr("class");
+    const tag = $el.prop('tagName')?.toLowerCase();
+    const className = $el.attr('class');
     const text = $el.text().trim();
 
     if (className) {
-      const classes = className.split(" ").filter((c) => c.length > 0);
-      return `${tag}.${classes.join(".")}`;
+      const classes = className.split(' ').filter((c) => c.length > 0);
+      return `${tag}.${classes.join('.')}`;
     }
 
     if (text && text.length < 50) {
@@ -318,7 +318,7 @@ ${this.generateWorkflowMethods(analysis)}
         const name = this.generateElementName(el);
         return `  private readonly ${name}Selector = '${el.selector}';`;
       })
-      .join("\n");
+      .join('\n');
   }
 
   private generateGetterMethods(elements: ElementInfo[]): string {
@@ -329,7 +329,7 @@ ${this.generateWorkflowMethods(analysis)}
     return cy.get(this.${name}Selector);
   }`;
       })
-      .join("\n\n");
+      .join('\n\n');
   }
 
   private generateInteractionMethods(elements: ElementInfo[]): string {
@@ -340,13 +340,13 @@ ${this.generateWorkflowMethods(analysis)}
       const pascalName = this.toPascalCase(name);
 
       switch (el.interactionType) {
-        case "click":
+        case 'click':
           methods.push(`  click${pascalName}(): void {
     this.get${pascalName}().should('be.visible').click();
   }`);
           break;
 
-        case "input":
+        case 'input':
           methods.push(`  type${pascalName}(text: string): void {
     this.get${pascalName}().should('be.visible').clear().type(text);
   }
@@ -356,7 +356,7 @@ ${this.generateWorkflowMethods(analysis)}
   }`);
           break;
 
-        case "select":
+        case 'select':
           methods.push(`  select${pascalName}(value: string): void {
     this.get${pascalName}().should('be.visible').select(value);
   }`);
@@ -364,7 +364,7 @@ ${this.generateWorkflowMethods(analysis)}
       }
     });
 
-    return methods.join("\n\n");
+    return methods.join('\n\n');
   }
 
   private generateFormMethods(forms: FormInfo[]): string {
@@ -372,26 +372,26 @@ ${this.generateWorkflowMethods(analysis)}
       .map((form, index) => {
         const formName = `Form${index + 1}`;
         const fieldMethods = form.fields
-          .filter((field) => field.interactionType === "input")
+          .filter((field) => field.interactionType === 'input')
           .map((field) => {
             const fieldName = this.generateElementName(field);
             return `    this.type${this.toPascalCase(
               fieldName
             )}(data.${fieldName});`;
           })
-          .join("\n");
+          .join('\n');
 
         const submitField = form.fields.find(
           (field) =>
-            field.type === "submit" ||
-            (field.tag === "button" && field.interactionType === "click")
+            field.type === 'submit' ||
+            (field.tag === 'button' && field.interactionType === 'click')
         );
 
         const submitMethod = submitField
           ? `    this.click${this.toPascalCase(
               this.generateElementName(submitField)
             )}();`
-          : "    // No submit button found";
+          : '    // No submit button found';
 
         return `  fill${formName}(data: any): void {
 ${fieldMethods}
@@ -401,7 +401,7 @@ ${fieldMethods}
 ${submitMethod}
   }`;
       })
-      .join("\n\n");
+      .join('\n\n');
   }
 
   private generateWorkflowMethods(analysis: PageAnalysis): string {
@@ -410,20 +410,20 @@ ${submitMethod}
     // Login workflow if login elements are detected
     const emailField = analysis.elements.find(
       (el) =>
-        el.name?.toLowerCase().includes("email") ||
-        el.id?.toLowerCase().includes("email") ||
-        el.type === "email"
+        el.name?.toLowerCase().includes('email') ||
+        el.id?.toLowerCase().includes('email') ||
+        el.type === 'email'
     );
     const passwordField = analysis.elements.find(
       (el) =>
-        el.name?.toLowerCase().includes("password") ||
-        el.id?.toLowerCase().includes("password") ||
-        el.type === "password"
+        el.name?.toLowerCase().includes('password') ||
+        el.id?.toLowerCase().includes('password') ||
+        el.type === 'password'
     );
     const loginButton = analysis.elements.find(
       (el) =>
-        el.text?.toLowerCase().includes("login") ||
-        el.text?.toLowerCase().includes("sign in")
+        el.text?.toLowerCase().includes('login') ||
+        el.text?.toLowerCase().includes('sign in')
     );
 
     if (emailField && passwordField && loginButton) {
@@ -439,12 +439,12 @@ ${submitMethod}
     // Search workflow if search elements are detected
     const searchField = analysis.elements.find(
       (el) =>
-        el.placeholder?.toLowerCase().includes("search") ||
-        el.name?.toLowerCase().includes("search") ||
-        el.id?.toLowerCase().includes("search")
+        el.placeholder?.toLowerCase().includes('search') ||
+        el.name?.toLowerCase().includes('search') ||
+        el.id?.toLowerCase().includes('search')
     );
     const searchButton = analysis.elements.find((el) =>
-      el.text?.toLowerCase().includes("search")
+      el.text?.toLowerCase().includes('search')
     );
 
     if (searchField) {
@@ -455,14 +455,14 @@ ${submitMethod}
         ? `this.click${this.toPascalCase(
             this.generateElementName(searchButton)
           )}();`
-        : "cy.get(this." +
+        : 'cy.get(this.' +
           this.generateElementName(searchField) +
           "Selector).type('{enter}');"
     }
   }`);
     }
 
-    return workflows.join("\n\n");
+    return workflows.join('\n\n');
   }
 
   generateTestSuite(analysis: PageAnalysis): string {
@@ -552,7 +552,7 @@ ${this.generateErrorTests(analysis)}
           name
         )}().should('be.visible');`;
       })
-      .join("\n");
+      .join('\n');
   }
 
   private generateInteractionTests(elements: ElementInfo[]): string {
@@ -563,14 +563,14 @@ ${this.generateErrorTests(analysis)}
       const pascalName = this.toPascalCase(name);
 
       switch (el.interactionType) {
-        case "click":
+        case 'click':
           tests.push(`    it('should be able to click ${name}', () => {
       page.get${pascalName}().should('be.visible').and('not.be.disabled');
       page.click${pascalName}();
     });`);
           break;
 
-        case "input":
+        case 'input':
           tests.push(`    it('should be able to type in ${name}', () => {
       const testText = 'test input';
       page.type${pascalName}(testText);
@@ -578,7 +578,7 @@ ${this.generateErrorTests(analysis)}
     });`);
           break;
 
-        case "select":
+        case 'select':
           tests.push(`    it('should be able to select from ${name}', () => {
       page.get${pascalName}().find('option').then($options => {
         if ($options.length > 1) {
@@ -592,7 +592,7 @@ ${this.generateErrorTests(analysis)}
       }
     });
 
-    return tests.join("\n\n");
+    return tests.join('\n\n');
   }
 
   private generateFormTests(forms: FormInfo[]): string {
@@ -602,14 +602,14 @@ ${this.generateErrorTests(analysis)}
         return `    it('should be able to fill and submit ${formName.toLowerCase()}', () => {
       const testData = {
 ${form.fields
-  .filter((field) => field.interactionType === "input")
+  .filter((field) => field.interactionType === 'input')
   .map(
     (field) =>
       `        ${this.generateElementName(
         field
       )}: 'test ${this.generateElementName(field)}'`
   )
-  .join(",\n")}
+  .join(',\n')}
       };
       
       page.fill${formName}(testData);
@@ -618,7 +618,7 @@ ${form.fields
       // Add assertions for form submission result
     });`;
       })
-      .join("\n\n");
+      .join('\n\n');
   }
 
   private generateNavigationTests(navigation: NavigationInfo[]): string {
@@ -632,12 +632,12 @@ ${form.fields
       // Add assertions for navigation result
     });`;
       })
-      .join("\n\n");
+      .join('\n\n');
   }
 
   private generateKeyboardTests(elements: ElementInfo[]): string {
     const interactiveElements = elements.filter(
-      (el) => el.interactionType === "click" || el.interactionType === "input"
+      (el) => el.interactionType === 'click' || el.interactionType === 'input'
     );
 
     return interactiveElements
@@ -648,7 +648,7 @@ ${form.fields
           name
         )}().focus().should('be.focused');`;
       })
-      .join("\n");
+      .join('\n');
   }
 
   private generateErrorTests(analysis: PageAnalysis): string {
@@ -670,7 +670,7 @@ ${form.fields
       // Add assertions for error handling
     });`);
 
-    return tests.join("\n\n");
+    return tests.join('\n\n');
   }
 
   private generateElementName(element: ElementInfo): string {
@@ -691,15 +691,15 @@ ${form.fields
     }
 
     return `${element.tag}${
-      element.type ? this.toPascalCase(element.type) : ""
+      element.type ? this.toPascalCase(element.type) : ''
     }Element`;
   }
 
   private toCamelCase(str: string): string {
     return str
-      .replace(/[^a-zA-Z0-9]/g, " ")
+      .replace(/[^a-zA-Z0-9]/g, ' ')
       .replace(/\s+(.)/g, (_, char) => char.toUpperCase())
-      .replace(/\s/g, "")
+      .replace(/\s/g, '')
       .replace(/^./, (char) => char.toLowerCase());
   }
 
@@ -712,10 +712,10 @@ ${form.fields
     try {
       const urlObj = new URL(url);
       const pathname = urlObj.pathname;
-      const segments = pathname.split("/").filter((s) => s.length > 0);
-      return segments.length > 0 ? segments[segments.length - 1] : "home";
+      const segments = pathname.split('/').filter((s) => s.length > 0);
+      return segments.length > 0 ? segments[segments.length - 1] : 'home';
     } catch {
-      return "page";
+      return 'page';
     }
   }
 
@@ -724,7 +724,7 @@ ${form.fields
       const urlObj = new URL(url);
       return urlObj.pathname;
     } catch {
-      return "/";
+      return '/';
     }
   }
 }
@@ -732,8 +732,8 @@ ${form.fields
 // MCP Server setup
 const server = new Server(
   {
-    name: "cypress-test-generator",
-    version: "1.0.0",
+    name: 'cypress-test-generator',
+    version: '1.0.0',
   },
   {
     capabilities: {
@@ -747,152 +747,152 @@ const generator = new CypressTestGenerator();
 // Define available tools
 const tools: Tool[] = [
   {
-    name: "scrape_page",
+    name: 'scrape_page',
     description:
-      "Scrape a web page and analyze its structure for test generation",
+      'Scrape a web page and analyze its structure for test generation',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
         url: {
-          type: "string",
-          description: "The URL of the page to scrape and analyze",
+          type: 'string',
+          description: 'The URL of the page to scrape and analyze',
         },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "generate_page_object",
-    description: "Generate a TypeScript Page Object class from page analysis",
+    name: 'generate_page_object',
+    description: 'Generate a TypeScript Page Object class from page analysis',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
         url: {
-          type: "string",
-          description: "The URL of the page to generate Page Object for",
+          type: 'string',
+          description: 'The URL of the page to generate Page Object for',
         },
         outputPath: {
-          type: "string",
-          description: "Optional path to save the generated Page Object file",
+          type: 'string',
+          description: 'Optional path to save the generated Page Object file',
         },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "generate_test_suite",
-    description: "Generate comprehensive Cypress test suite from page analysis",
+    name: 'generate_test_suite',
+    description: 'Generate comprehensive Cypress test suite from page analysis',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
         url: {
-          type: "string",
-          description: "The URL of the page to generate tests for",
+          type: 'string',
+          description: 'The URL of the page to generate tests for',
         },
         outputPath: {
-          type: "string",
-          description: "Optional path to save the generated test file",
+          type: 'string',
+          description: 'Optional path to save the generated test file',
         },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "generate_full_test_setup",
-    description: "Generate both Page Object and test suite for a URL",
+    name: 'generate_full_test_setup',
+    description: 'Generate both Page Object and test suite for a URL',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
         url: {
-          type: "string",
+          type: 'string',
           description:
-            "The URL of the page to generate complete test setup for",
+            'The URL of the page to generate complete test setup for',
         },
         outputDir: {
-          type: "string",
-          description: "Optional directory to save generated files",
+          type: 'string',
+          description: 'Optional directory to save generated files',
         },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "analyze_accessibility",
-    description: "Analyze a web page for accessibility issues using axe-core",
+    name: 'analyze_accessibility',
+    description: 'Analyze a web page for accessibility issues using axe-core',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        url: { type: "string", description: "The URL to analyze" },
+        url: { type: 'string', description: 'The URL to analyze' },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "screenshot_page",
-    description: "Take a screenshot of the page and return as base64",
+    name: 'screenshot_page',
+    description: 'Take a screenshot of the page and return as base64',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        url: { type: "string", description: "The URL to screenshot" },
+        url: { type: 'string', description: 'The URL to screenshot' },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "extract_text_content",
-    description: "Extract all visible text from a web page",
+    name: 'extract_text_content',
+    description: 'Extract all visible text from a web page',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        url: { type: "string", description: "The URL to extract text from" },
+        url: { type: 'string', description: 'The URL to extract text from' },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "list_links",
-    description: "List all links and their destinations on a web page",
+    name: 'list_links',
+    description: 'List all links and their destinations on a web page',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        url: { type: "string", description: "The URL to list links from" },
+        url: { type: 'string', description: 'The URL to list links from' },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "extract_table_data",
-    description: "Extract data from all tables on a web page",
+    name: 'extract_table_data',
+    description: 'Extract data from all tables on a web page',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        url: { type: "string", description: "The URL to extract tables from" },
+        url: { type: 'string', description: 'The URL to extract tables from' },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "get_cookies",
-    description: "Retrieve all cookies for a web page",
+    name: 'get_cookies',
+    description: 'Retrieve all cookies for a web page',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        url: { type: "string", description: "The URL to get cookies from" },
+        url: { type: 'string', description: 'The URL to get cookies from' },
       },
-      required: ["url"],
+      required: ['url'],
     },
   },
   {
-    name: "set_viewport",
-    description: "Set the viewport size before scraping a page",
+    name: 'set_viewport',
+    description: 'Set the viewport size before scraping a page',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        url: { type: "string", description: "The URL to visit" },
-        width: { type: "number", description: "Viewport width" },
-        height: { type: "number", description: "Viewport height" },
+        url: { type: 'string', description: 'The URL to visit' },
+        width: { type: 'number', description: 'Viewport width' },
+        height: { type: 'number', description: 'Viewport height' },
       },
-      required: ["url", "width", "height"],
+      required: ['url', 'width', 'height'],
     },
   },
 ];
@@ -905,7 +905,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
   let page: Page | null = null;
-  
+
   const cleanup = async () => {
     if (page) {
       try {
@@ -919,20 +919,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
-      case "scrape_page": {
+      case 'scrape_page': {
         const { url } = args as { url: string };
         const analysis = await generator.scrapePage(url);
         return {
           content: [
             {
-              type: "text",
+              type: 'text',
               text: JSON.stringify(analysis, null, 2),
             },
           ],
         };
       }
 
-      case "generate_page_object": {
+      case 'generate_page_object': {
         const { url, outputPath } = args as {
           url: string;
           outputPath?: string;
@@ -941,20 +941,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const pageObject = generator.generatePageObject(analysis);
 
         if (outputPath) {
-          await fs.writeFile(outputPath, pageObject, "utf-8");
+          await fs.writeFile(outputPath, pageObject, 'utf-8');
         }
 
         return {
           content: [
             {
-              type: "text",
+              type: 'text',
               text: pageObject,
             },
           ],
         };
       }
 
-      case "generate_test_suite": {
+      case 'generate_test_suite': {
         const { url, outputPath } = args as {
           url: string;
           outputPath?: string;
@@ -963,145 +963,162 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const testSuite = generator.generateTestSuite(analysis);
 
         if (outputPath) {
-          await fs.writeFile(outputPath, testSuite, "utf-8");
+          await fs.writeFile(outputPath, testSuite, 'utf-8');
         }
 
         return {
           content: [
             {
-              type: "text",
+              type: 'text',
               text: testSuite,
             },
           ],
         };
       }
 
-      case "generate_full_test_setup": {
+      case 'generate_full_test_setup': {
         const { url, outputDir } = args as { url: string; outputDir?: string };
         const analysis = await generator.scrapePage(url);
         const pageObject = generator.generatePageObject(analysis);
         const testSuite = generator.generateTestSuite(analysis);
 
-        const className = generator["toPascalCase"](
-          generator["getPageName"](url)
+        const className = generator['toPascalCase'](
+          generator['getPageName'](url)
         );
 
         if (outputDir) {
-          await fs.mkdir(path.join(outputDir, "page-objects"), {
+          await fs.mkdir(path.join(outputDir, 'page-objects'), {
             recursive: true,
           });
-          await fs.mkdir(path.join(outputDir, "tests"), { recursive: true });
+          await fs.mkdir(path.join(outputDir, 'tests'), { recursive: true });
 
           await fs.writeFile(
-            path.join(outputDir, "page-objects", `${className}Page.ts`),
+            path.join(outputDir, 'page-objects', `${className}Page.ts`),
             pageObject,
-            "utf-8"
+            'utf-8'
           );
 
           await fs.writeFile(
-            path.join(outputDir, "tests", `${className}.spec.ts`),
+            path.join(outputDir, 'tests', `${className}.spec.ts`),
             testSuite,
-            "utf-8"
+            'utf-8'
           );
         }
 
         return {
           content: [
             {
-              type: "text",
+              type: 'text',
               text: `Generated Page Object and Test Suite for ${url}\n\n=== PAGE OBJECT ===\n\n${pageObject}\n\n=== TEST SUITE ===\n\n${testSuite}`,
             },
           ],
         };
       }
 
-      case "analyze_accessibility": {
+      case 'analyze_accessibility': {
         const { url } = args as { url: string };
         page = await generator.createPage();
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
         // Try to inject axe-core from CDN
-        await page.addScriptTag({ url: "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.7.2/axe.min.js" });
+        await page.addScriptTag({
+          url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.7.2/axe.min.js',
+        });
         const results = await page.evaluate(async () => {
           if (window.axe) {
             return await window.axe.run();
           } else {
-            return { error: "axe-core not loaded" };
+            return { error: 'axe-core not loaded' };
           }
         });
         await cleanup();
-        return { content: [{ type: "text", text: JSON.stringify(results, null, 2) }] };
+        return {
+          content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],
+        };
       }
 
-      case "screenshot_page": {
+      case 'screenshot_page': {
         const { url } = args as { url: string };
         page = await generator.createPage();
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
-        const screenshot = await page.screenshot({ encoding: "base64" });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+        const screenshot = await page.screenshot({ encoding: 'base64' });
         await cleanup();
-        return { content: [{ type: "image", image: screenshot }] };
+        return { content: [{ type: 'image', image: screenshot }] };
       }
 
-      case "extract_text_content": {
+      case 'extract_text_content': {
         const { url } = args as { url: string };
         page = await generator.createPage();
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
         const text = await page.evaluate(() => {
           return document.body.innerText;
         });
         await cleanup();
-        return { content: [{ type: "text", text }] };
+        return { content: [{ type: 'text', text }] };
       }
 
-      case "list_links": {
+      case 'list_links': {
         const { url } = args as { url: string };
         page = await generator.createPage();
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
         const links = await page.evaluate(() => {
           const links: Array<{ href: string | null; text: string }> = [];
           document.querySelectorAll('a[href]').forEach((a: Element) => {
             if (a instanceof HTMLAnchorElement) {
               links.push({
                 href: a.getAttribute('href'),
-                text: a.textContent?.trim() || ""
+                text: a.textContent?.trim() || '',
               });
             }
           });
           return links;
         });
         await cleanup();
-        return { content: [{ type: "text", text: JSON.stringify(links, null, 2) }] };
+        return {
+          content: [{ type: 'text', text: JSON.stringify(links, null, 2) }],
+        };
       }
 
-      case "extract_table_data": {
+      case 'extract_table_data': {
         const { url } = args as { url: string };
         page = await generator.createPage();
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
         const tables = await page.evaluate(() => {
           const results: Array<{ headers: string[]; rows: string[][] }> = [];
           document.querySelectorAll('table').forEach((table: Element) => {
             if (!(table instanceof HTMLTableElement)) return;
-            
+
             let headers: string[] = [];
             const thead = table.querySelector('thead');
             if (thead instanceof HTMLTableSectionElement) {
-              headers = Array.from(thead.querySelectorAll('th')).map(th => 
-                th instanceof HTMLTableCellElement ? th.textContent?.trim() || "" : ""
+              headers = Array.from(thead.querySelectorAll('th')).map((th) =>
+                th instanceof HTMLTableCellElement
+                  ? th.textContent?.trim() || ''
+                  : ''
               );
             }
             if (headers.length === 0) {
               const firstTr = table.querySelector('tr');
               if (firstTr instanceof HTMLTableRowElement) {
-                headers = Array.from(firstTr.querySelectorAll('th,td')).map(cell =>
-                  cell instanceof HTMLTableCellElement ? cell.textContent?.trim() || "" : ""
+                headers = Array.from(firstTr.querySelectorAll('th,td')).map(
+                  (cell) =>
+                    cell instanceof HTMLTableCellElement
+                      ? cell.textContent?.trim() || ''
+                      : ''
                 );
               }
             }
 
             const rows = Array.from(table.querySelectorAll('tr'))
               .map((tr, i) => {
-                if (!(tr instanceof HTMLTableRowElement) || (i === 0 && headers.length > 0)) return null;
-                const cells = Array.from(tr.querySelectorAll('td')).map(td =>
-                  td instanceof HTMLTableCellElement ? td.textContent?.trim() || "" : ""
+                if (
+                  !(tr instanceof HTMLTableRowElement) ||
+                  (i === 0 && headers.length > 0)
+                )
+                  return null;
+                const cells = Array.from(tr.querySelectorAll('td')).map((td) =>
+                  td instanceof HTMLTableCellElement
+                    ? td.textContent?.trim() || ''
+                    : ''
                 );
                 return cells.length > 0 ? cells : null;
               })
@@ -1112,27 +1129,47 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           return results;
         });
         await cleanup();
-        return { content: [{ type: "text", text: JSON.stringify(tables, null, 2) }] };
+        return {
+          content: [{ type: 'text', text: JSON.stringify(tables, null, 2) }],
+        };
       }
 
-      case "get_cookies": {
+      case 'get_cookies': {
         const { url } = args as { url: string };
         page = await generator.createPage();
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
         const cookies = await page.cookies();
         await cleanup();
-        return { content: [{ type: "text", text: JSON.stringify(cookies, null, 2) }] };
+        return {
+          content: [{ type: 'text', text: JSON.stringify(cookies, null, 2) }],
+        };
       }
 
-      case "set_viewport": {
-        const { url, width, height } = args as { url: string; width: number; height: number };
+      case 'set_viewport': {
+        const { url, width, height } = args as {
+          url: string;
+          width: number;
+          height: number;
+        };
         page = await generator.createPage();
         await page.setViewport({ width, height });
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
         const html = await page.content();
         const title = await page.title();
         await cleanup();
-        return { content: [{ type: "text", text: JSON.stringify({ url, title, viewport: { width, height }, html }) }] };
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                url,
+                title,
+                viewport: { width, height },
+                html,
+              }),
+            },
+          ],
+        };
       }
 
       default:
@@ -1142,7 +1179,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `Error: ${
             error instanceof Error ? error.message : String(error)
           }`,
@@ -1154,12 +1191,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 // Cleanup on exit
-process.on("SIGTERM", async () => {
+process.on('SIGTERM', async () => {
   await generator.closeBrowser();
   process.exit(0);
 });
 
-process.on("SIGINT", async () => {
+process.on('SIGINT', async () => {
   await generator.closeBrowser();
   process.exit(0);
 });
@@ -1168,10 +1205,10 @@ process.on("SIGINT", async () => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Cypress Test Generator MCP Server running on stdio");
+  console.error('Cypress Test Generator MCP Server running on stdio');
 }
 
 main().catch((error) => {
-  console.error("Failed to start server:", error);
+  console.error('Failed to start server:', error);
   process.exit(1);
 });
