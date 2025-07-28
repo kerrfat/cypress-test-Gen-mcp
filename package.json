@@ -1,0 +1,47 @@
+{
+  "name": "cypress-test-Gen-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for generating Cypress test cases and Page Object Models",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "cypress-test-Gen-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "check-format": "prettier --check \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "@types/puppeteer": "^5.4.7",
+    "cheerio": "^1.1.0",
+    "puppeteer": "^24.15.0",
+    "zod": "^3.25.76"
+  },
+  "keywords": [
+    "cypress",
+    "testing",
+    "automation",
+    "mcp",
+    "page-objects",
+    "test-generation"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3"
+  }
+}
