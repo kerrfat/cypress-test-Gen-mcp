@@ -1,5 +1,5 @@
 {
-  "name": "cypress-test-Gen-mcp",
+  "name": "cypress-test-gen-mcp",
   "version": "1.0.0",
   "description": "MCP server for generating Cypress test cases and Page Object Models",
   "type": "module",
@@ -15,7 +15,14 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "check-format": "prettier --check \"src/**/*.ts\""
+    "check-format": "prettier --check \"src/**/*.ts\"",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.0",
@@ -41,6 +48,8 @@
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3"
   }
